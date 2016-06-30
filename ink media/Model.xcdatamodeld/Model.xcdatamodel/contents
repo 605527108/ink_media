@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="10174" systemVersion="15G12a" minimumToolsVersion="Xcode 7.0">
+    <entity name="CartoonFile" representedClassName=".CartoonFile" syncable="YES">
+        <attribute name="id" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="MovieFile" representedClassName=".MovieFile" syncable="YES">
+        <attribute name="id" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="MusicFile" representedClassName=".MusicFile" syncable="YES">
+        <attribute name="id" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="CartoonFile" positionX="-63" positionY="-18" width="128" height="75"/>
+        <element name="MovieFile" positionX="-54" positionY="-9" width="128" height="75"/>
+        <element name="MusicFile" positionX="-36" positionY="9" width="128" height="75"/>
+    </elements>
+</model>
