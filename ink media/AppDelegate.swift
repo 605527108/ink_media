@@ -52,7 +52,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     func checkConnectStatusToNKU()
     {
-        let testURL = NSURL(string: "http://movie.nku.cn")
+        let testURL = NSURL(string: "http://222.30.44.37/")
         let request = NSMutableURLRequest(URL: testURL!, cachePolicy: .ReloadIgnoringLocalCacheData, timeoutInterval: 3)
         let URLSessionConfiguration = NSURLSessionConfiguration.defaultSessionConfiguration()
         let session = NSURLSession(configuration: URLSessionConfiguration, delegate: nil, delegateQueue: nil)

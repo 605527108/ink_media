@@ -31,18 +31,18 @@ class MovieFetcher
         
         if searchType == .index
         {
-            let movieURL = NSURL(string: "http://movie.nku.cn")
+            let movieURL = NSURL(string: "http://222.30.44.37/")
             networkUtilityForMovie.HTTPGETRequestForURL(movieURL!)
         }
         else if searchType == .name
         {
-            let movieURL = NSURL(string: "http://movie.nku.cn/filmclass.php?action=search")
+            let movieURL = NSURL(string: "http://222.30.44.37/filmclass.php?action=search")
             let params = ["searchtype":"name","searchstring":searchText]
             networkUtilityForMovie.HTTPPOSTRequestForURL(movieURL!, parameters: params)
         }
         else if searchType == .detail
         {
-            let movieURL = NSURL(string: "http://movie.nku.cn/filminfo/filminfo_"+searchText+".htm")
+            let movieURL = NSURL(string: "http://222.30.44.37/filminfo/filminfo_"+searchText+".htm")
             networkUtilityForMovie.HTTPGETRequestForURL(movieURL!)
         }
         else if searchType == .link
@@ -52,7 +52,7 @@ class MovieFetcher
         }
         else if searchType == .thumbnailOnline
         {
-            let movieURL = NSURL(string: "http://movie.nku.cn/posterimgs/big/" + searchText + ".jpg")
+            let movieURL = NSURL(string: "http://222.30.44.37/posterimgs/big/" + searchText + ".jpg")
             networkUtilityForMovie.HTTPGETRequestForURL(movieURL!)
         }
         else if searchType == .thumbnailOffline
