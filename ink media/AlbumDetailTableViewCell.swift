@@ -33,7 +33,6 @@ class AlbumDetailTableViewCell: UITableViewCell {
     
     private func updateUI()
     {
-        albumThumbnail.image = nil
         if album != nil
         {
             albumName.text = album!.name!

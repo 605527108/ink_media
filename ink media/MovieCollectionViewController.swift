@@ -13,7 +13,7 @@ private let reuseIdentifier = "MovieCollectionCell"
 class MovieCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UISearchBarDelegate {
     
     var searchController: UISearchController!
-    var connectToNKU = true
+    let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
     var readyToDisplay = false
     var waitingView: WaitingView?
     var blankView: UIView?
@@ -31,7 +31,10 @@ class MovieCollectionViewController: UICollectionViewController, UICollectionVie
         didSet {
             if movies.count > 0
             {
-                fetchThumbnails()
+                if connectToNKU!
+                {
+                    fetchThumbnails()
+                }
             }
             collectionView?.reloadData()
         }
@@ -110,8 +113,12 @@ class MovieCollectionViewController: UICollectionViewController, UICollectionVie
                 let indexPath = collectionView!.indexPathForCell(cell),
                 let seguedToMDTVC = segue.destinationViewController as? MovieDetailTableViewController
             {
-                seguedToMDTVC.connectToNKU = self.connectToNKU
+                seguedToMDTVC.connectToNKU = self.connectToNKU!
                 seguedToMDTVC.movie = movies[indexPath.row]
+                if !connectToNKU!
+                {
+                    seguedToMDTVC.thumbnailImage = cell.movieThumbnail.image
+                }
             }
         }
     }
@@ -131,6 +138,10 @@ class MovieCollectionViewController: UICollectionViewController, UICollectionVie
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! MovieCollectionViewCell
         cell.movie = movies[indexPath.row]
+        if !connectToNKU!
+        {
+            cell.movieThumbnail.image = UIImage(named: "movie_offline_\((movies[indexPath.row].id)!)")
+        }
         return cell
     }
     
@@ -152,29 +163,35 @@ class MovieCollectionViewController: UICollectionViewController, UICollectionVie
     
     private func fetchFirstPage()
     {
-        addBlankView()
-        readyToDisplay = false
-        let firstPageFetcher = MovieFetcher(searchText: "", searchType: .index)
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0))
+        if connectToNKU == false
         {
-            firstPageFetcher.fetchMultipleMovies({ [weak weakSelf = self] newMovies in
-                dispatch_async(dispatch_get_main_queue(), {
-                    if !newMovies.isEmpty {
-                        weakSelf?.movies = newMovies
-                    } else {
-                        weakSelf?.connectToNKU = false
-                        weakSelf?.movies = Movie.allMovies()
-                    }
+            self.movies = Movie.allMovies()
+        }
+        else
+        {
+            addBlankView()
+            readyToDisplay = false
+            let firstPageFetcher = MovieFetcher(searchText: "", searchType: .index)
+            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0))
+            {
+                firstPageFetcher.fetchMultipleMovies({ [weak weakSelf = self] newMovies in
+                    dispatch_async(dispatch_get_main_queue(), {
+                        if !newMovies.isEmpty {
+                            weakSelf?.movies = newMovies
+                        } else {
+                            weakSelf?.movies = Movie.allMovies()
+                        }
+                    })
                 })
-            })
+            }
         }
     }
     
     private func searchForMovies()
     {
-        addBlankView()
-        readyToDisplay = false
-        if connectToNKU {
+        if connectToNKU! {
+            addBlankView()
+            readyToDisplay = false
             if let fetcher = movieSearcher {
                 lastFetcher = fetcher
                 dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0))
@@ -206,12 +223,7 @@ class MovieCollectionViewController: UICollectionViewController, UICollectionVie
             if !newMovies.isEmpty {
                 self.movies = newMovies
             }
-            else
-            {
-                self.readyToDisplay = true
-            }
         }
-        
     }
     
     func fetchThumbnails()
@@ -220,15 +232,10 @@ class MovieCollectionViewController: UICollectionViewController, UICollectionVie
         if count > -1
         {
             for index in 0...count {
-                var thumbnailFetcher: MovieFetcher?
-                if connectToNKU {
-                    thumbnailFetcher = MovieFetcher(searchText: movies[index].id!, searchType: .thumbnailOnline)
-                } else {
-                    thumbnailFetcher = MovieFetcher(searchText: movies[index].id!, searchType: .thumbnailOffline)
-                }
+                let thumbnailFetcher = MovieFetcher(searchText: movies[index].id!, searchType: .thumbnailOnline)
                 dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0))
                 {
-                    thumbnailFetcher!.fetchMovieThumbnail({ [weak weakSelf = self] thumbnailData in
+                    thumbnailFetcher.fetchMovieThumbnail({ [weak weakSelf = self] thumbnailData in
                         dispatch_async(dispatch_get_main_queue(), {
                             if thumbnailData != nil {
                                 weakSelf!.movies[index].thumbnailData = thumbnailData

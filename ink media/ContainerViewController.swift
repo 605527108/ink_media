@@ -35,6 +35,11 @@ class ContainerViewController: UIViewController {
     
     var currentPlayingIndex: Int?
     
+    let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
+    let hasMovieFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasMovieFile
+    let hasCartoonFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasCartoonFile
+    let hasMusicFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasMusicFile
+    
     var centerNavigationController: UINavigationController!
     var centerViewController: AnyObject!
     var currentCenterViewControllerClass: String!
@@ -75,6 +80,21 @@ class ContainerViewController: UIViewController {
         catch
         {
             print("Player set background failed")
+        }
+        if connectToNKU == false && hasMovieFile == false && hasCartoonFile == false && hasMusicFile == false
+        {
+            self.musicPlayingQueue.append(Music(name: "南开大学校歌", id: "0"))
+            numOfMusicFile = 1
+            currentPlayingIndex = 0
+            deInitPlayer()
+            
+            var playingItemQueue = [AVPlayerItem]()
+            let bgm = NSBundle.mainBundle().pathForResource("bgm", ofType: "wav")
+            let fileURL = NSURL(fileURLWithPath: bgm!)
+            let playItem = AVPlayerItem(URL: fileURL)
+            playingItemQueue.append(playItem)
+            audioPlayer = AVQueuePlayer(items: playingItemQueue)
+            startObserving()
         }
     }
     
@@ -242,6 +262,7 @@ extension ContainerViewController: SlidePanelViewControllerDelegate {
     func currentlyPlayingMusic() -> Music? {
         if playingOrStop() != .Stop
         {
+            print("currentPlayingIndex\(currentPlayingIndex)")
             let music = musicPlayingQueue[currentPlayingIndex!]
             return music
         }
@@ -367,8 +388,16 @@ extension ContainerViewController {
                 print(errorMessage!)
             }
         } else if keyPath == "currentItem" {
-            currentPlayingIndex = (currentPlayingIndex! + 1) % numOfMusicFile!
+            print("reach end")
+            if numOfMusicFile != nil
+            {
+                print("numOfMusicFile \(numOfMusicFile)")
+                currentPlayingIndex = (currentPlayingIndex! + 1) % numOfMusicFile!
+                print("currentPlayingIndex \(currentPlayingIndex)")
+
+            }
             if let itemRemoved = change?[NSKeyValueChangeOldKey] as? AVPlayerItem {
+                print("requeue item")
                 stopObserving()
                 audioPlayer!.removeItem(itemRemoved)
                 itemRemoved.seekToTime(kCMTimeZero)

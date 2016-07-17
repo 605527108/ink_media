@@ -13,6 +13,16 @@ class MusicDetailTableViewController: UITableViewController {
 
     var connectToNKU = true
     
+    var thumbnailImage: UIImage? {
+        didSet {
+            self.tableView.backgroundView = UIImageView(image: thumbnailImage)
+            let blur = UIBlurEffect(style: UIBlurEffectStyle.ExtraLight)
+            let blurView = UIVisualEffectView(effect: blur)
+            blurView.frame = self.tableView.bounds
+            self.tableView.backgroundView!.insertSubview(blurView, atIndex: 0)
+        }
+    }
+    
     private struct Storyboard {
         static let AlbumDetailTableViewCellIdentifier = "AlbumDetail"
         static let MusicDownloadTableViewCellIdentifier = "MusicDownload"
@@ -126,6 +136,10 @@ class MusicDetailTableViewController: UITableViewController {
             if let albumCell = cell as? AlbumDetailTableViewCell
             {
                 albumCell.album = album!
+                if !connectToNKU
+                {
+                    albumCell.albumThumbnail.image = thumbnailImage
+                }
             }
 
         } else {

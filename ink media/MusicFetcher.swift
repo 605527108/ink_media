@@ -211,12 +211,12 @@ class MusicFetcher
                             let match = regex.matchesInString(musicString, options:NSMatchingOptions(rawValue:0), range: NSMakeRange(0, musicString.characters.count))
                             if match.count > 0
                             {
-                            let result = match[0].rangeAtIndex(1)
-                            let resStr = (musicString as NSString).substringWithRange(result)
-                            var resChar = resStr.characters
-                            let lastCh = resChar.popLast()
-                            let secondLastCh = resChar.popLast()
-                            thumbnailURL = "http://imgcache.qq.com/music/photo/mid_album_300/\(secondLastCh!)/\(lastCh!)/\(resStr).jpg"
+                                let result = match[0].rangeAtIndex(1)
+                                let resStr = (musicString as NSString).substringWithRange(result)
+                                var resChar = resStr.characters
+                                let lastCh = resChar.popLast()
+                                let secondLastCh = resChar.popLast()
+                                thumbnailURL = "http://imgcache.qq.com/music/photo/mid_album_300/\(secondLastCh!)/\(lastCh!)/\(resStr).jpg"
                             }
                         }
                         catch {

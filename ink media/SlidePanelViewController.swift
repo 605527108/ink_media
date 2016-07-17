@@ -25,7 +25,7 @@ class SlidePanelViewController: UIViewController {
 
     var delegate: SlidePanelViewControllerDelegate?
     
-    let tabs = ["光影传奇" ,"12Club动漫" ,"桃源音乐", "IPv6电视","电影文件","动漫播放器","音乐播放器"]
+    let tabs = ["光影传奇" ,"12Club动漫" ,"桃源音乐", "音乐播放器","IPv6电视","电影文件","动漫播放器"]
     let imageName = ["btn_slidebar_1","btn_slidebar_2","btn_slidebar_3","btn_slidebar_4","btn_slidebar_1","btn_slidebar_2","btn_slidebar_3"]
     @IBOutlet weak var tableView: UITableView!
     
@@ -53,7 +53,7 @@ extension SlidePanelViewController: UITableViewDataSource {
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if connectToNKU == false && hasMovieFile == false && hasCartoonFile == false && hasMusicFile == false {
-            return 3
+            return 4
         }
         return 7
     }
@@ -106,7 +106,10 @@ extension SlidePanelViewController: UITableViewDelegate {
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if let _ = tableView.cellForRowAtIndexPath(indexPath) as? MusicPlayingCell
         {
-            delegate?.tabSelected("音乐播放器")
+            if !(connectToNKU == false && hasMovieFile == false && hasCartoonFile == false && hasMusicFile == false)
+            {
+                delegate?.tabSelected("音乐播放器")
+            }
         }
         else if let cell = tableView.cellForRowAtIndexPath(indexPath) as? TabCell
         {

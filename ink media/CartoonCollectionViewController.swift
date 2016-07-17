@@ -12,8 +12,8 @@ private let reuseIdentifier = "CartoonCollectionCell"
 
 class CartoonCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UISearchBarDelegate {
     
+    let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
     var searchController: UISearchController!
-    var connectToNKU = true
     var readyToDisplay = false
     var waitingView: WaitingView?
     var blankView: UIView?
@@ -31,7 +31,10 @@ class CartoonCollectionViewController: UICollectionViewController, UICollectionV
         didSet {
             if cartoons.count > 0
             {
-                fetchThumbnails()
+                if connectToNKU!
+                {
+                    fetchThumbnails()
+                }
             }
             collectionView?.reloadData()
         }
@@ -83,28 +86,34 @@ class CartoonCollectionViewController: UICollectionViewController, UICollectionV
     }
     
     func fetchFirstPage() {
-        addBlankView()
-        readyToDisplay = false
-        let firstPageFetcher = CartoonFetcher(searchText: "", searchType: .index)
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0))
+        if connectToNKU == false
         {
-            firstPageFetcher.fetchMultipleCartoons({ [weak weakSelf = self] newCartoons in
-                dispatch_async(dispatch_get_main_queue(), {
-                    if !newCartoons.isEmpty {
-                        weakSelf?.cartoons = newCartoons
-                    } else {
-                        weakSelf?.connectToNKU = false
-                        weakSelf?.cartoons = Cartoon.allCartoons()
-                    }
+            self.cartoons = Cartoon.allCartoons()
+        }
+        else
+        {
+            addBlankView()
+            readyToDisplay = false
+            let firstPageFetcher = CartoonFetcher(searchText: "", searchType: .index)
+            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0))
+            {
+                firstPageFetcher.fetchMultipleCartoons({ [weak weakSelf = self] newCartoons in
+                    dispatch_async(dispatch_get_main_queue(), {
+                        if !newCartoons.isEmpty {
+                            weakSelf?.cartoons = newCartoons
+                        } else {
+                            weakSelf?.cartoons = Cartoon.allCartoons()
+                        }
+                    })
                 })
-            })
+            }
         }
     }
     
     func searchForCartoon() {
-        addBlankView()
-        readyToDisplay = false
-        if connectToNKU {
+        if connectToNKU! {
+            addBlankView()
+            readyToDisplay = false
             if let fetcher = cartoonSearcher {
                 lastFetcher = fetcher
                 dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0))
@@ -139,10 +148,6 @@ class CartoonCollectionViewController: UICollectionViewController, UICollectionV
             if !newCartoons.isEmpty {
                 self.cartoons = newCartoons
             }
-            else
-            {
-                self.readyToDisplay = true
-            }
         }
     }
     
@@ -154,29 +159,18 @@ class CartoonCollectionViewController: UICollectionViewController, UICollectionV
         {
             for index in 0...count
             {
-                var thumbnailFetcher: CartoonFetcher?
-                if connectToNKU {
-                    if let thumbnailURL = cartoons[index].thumbnailURL
-                    {
-                        thumbnailFetcher = CartoonFetcher(searchText: thumbnailURL, searchType: .thumbnailOnline)
-                    }
-                } else {
-                    thumbnailFetcher = CartoonFetcher(searchText: cartoons[index].id!, searchType: .thumbnailOffline)
-                }
+                let thumbnailFetcher = CartoonFetcher(searchText: cartoons[index].thumbnailURL!, searchType: .thumbnailOnline)
                 dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0))
                 {
-                    if thumbnailFetcher != nil
-                    {
-                        thumbnailFetcher!.fetchCartoonThumbnail({ [weak weakSelf = self] thumbnailData in
-                            dispatch_async(dispatch_get_main_queue(), {
-                                if thumbnailData != nil {
-                                    weakSelf!.cartoons[index].thumbnailData = thumbnailData
-                                    let indexPath = NSIndexPath(forItem: index, inSection: 0)
-                                    weakSelf?.collectionView?.reloadItemsAtIndexPaths([indexPath])
-                                }
-                            })
+                    thumbnailFetcher.fetchCartoonThumbnail({ [weak weakSelf = self] thumbnailData in
+                        dispatch_async(dispatch_get_main_queue(), {
+                            if thumbnailData != nil {
+                                weakSelf!.cartoons[index].thumbnailData = thumbnailData
+                                let indexPath = NSIndexPath(forItem: index, inSection: 0)
+                                weakSelf?.collectionView?.reloadItemsAtIndexPaths([indexPath])
+                            }
                         })
-                    }
+                    })
                     if index == count
                     {
                         self.readyToDisplay = true
@@ -213,8 +207,12 @@ class CartoonCollectionViewController: UICollectionViewController, UICollectionV
                 let indexPath = collectionView!.indexPathForCell(cell),
                 let seguedToCDTVC = segue.destinationViewController as? CartoonDetailTableViewController
             {
-                seguedToCDTVC.connectToNKU = self.connectToNKU
                 seguedToCDTVC.cartoon = cartoons[indexPath.row]
+                seguedToCDTVC.connectToNKU = self.connectToNKU!
+                if !connectToNKU!
+                {
+                    seguedToCDTVC.thumbnailImage = cell.cartoonThumbnailImageView.image
+                }
             }
         }
     }
@@ -234,6 +232,10 @@ class CartoonCollectionViewController: UICollectionViewController, UICollectionV
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! CartoonCollectionViewCell
         cell.cartoon = cartoons[indexPath.row]
+        if !connectToNKU!
+        {
+            cell.cartoonThumbnailImageView.image = UIImage(named: "cartoon_offline_\((cartoons[indexPath.row].id)!)")
+        }
         return cell
     }
     

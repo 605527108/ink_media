@@ -27,6 +27,16 @@ class MovieDetailTableViewController: UITableViewController {
     
     var connectToNKU = true
     
+    var thumbnailImage: UIImage? {
+        didSet {
+            self.tableView.backgroundView = UIImageView(image: thumbnailImage)
+            let blur = UIBlurEffect(style: UIBlurEffectStyle.ExtraLight)
+            let blurView = UIVisualEffectView(effect: blur)
+            blurView.frame = self.tableView.bounds
+            self.tableView.backgroundView!.insertSubview(blurView, atIndex: 0)
+        }
+    }
+    
     var movie: Movie? {
         didSet {
             if connectToNKU
@@ -140,6 +150,10 @@ class MovieDetailTableViewController: UITableViewController {
             if let movieDetailTableViewCell = cell as? MovieDetailTableViewCell
             {
                 movieDetailTableViewCell.movie = movie
+                if !connectToNKU
+                {
+                    movieDetailTableViewCell.thumbnailImageView.image = thumbnailImage
+                }
             }
         } else if indexPath.section == 1 {
             cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.MovieContentTableViewCellIdentifier)!

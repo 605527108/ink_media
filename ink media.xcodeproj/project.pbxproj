@@ -58,6 +58,7 @@
 		4E992CF71D1D8D9F00D801A6 /* CartoonDownloadTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E992CF61D1D8D9F00D801A6 /* CartoonDownloadTableViewCell.swift */; };
 		4E992CF91D1D99D300D801A6 /* MusicDownloadTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E992CF81D1D99D300D801A6 /* MusicDownloadTableViewCell.swift */; };
 		4EA39ABC1D1D1FCA00C26971 /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EA39ABB1D1D1FCA00C26971 /* Video.swift */; };
+		4EDDA26E1D375A3E00C8D0D0 /* bgm.wav in Resources */ = {isa = PBXBuildFile; fileRef = 4EDDA26D1D375A3E00C8D0D0 /* bgm.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -114,6 +115,7 @@
 		4E992CF61D1D8D9F00D801A6 /* CartoonDownloadTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartoonDownloadTableViewCell.swift; sourceTree = "<group>"; };
 		4E992CF81D1D99D300D801A6 /* MusicDownloadTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MusicDownloadTableViewCell.swift; sourceTree = "<group>"; };
 		4EA39ABB1D1D1FCA00C26971 /* Video.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
+		4EDDA26D1D375A3E00C8D0D0 /* bgm.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = bgm.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +148,7 @@
 		4E939BEF1D197B900086E8D8 /* ink media */ = {
 			isa = PBXGroup;
 			children = (
+				4EDDA26D1D375A3E00C8D0D0 /* bgm.wav */,
 				4E7FE1DE1D1B7A7C00D612E5 /* WaitingView.swift */,
 				4E67284D1D1D065D00D12583 /* Download.swift */,
 				4EA39ABB1D1D1FCA00C26971 /* Video.swift */,
@@ -301,6 +304,7 @@
 				4E939BFB1D197B900086E8D8 /* LaunchScreen.storyboard in Resources */,
 				4E939BF81D197B900086E8D8 /* Assets.xcassets in Resources */,
 				4E939BF61D197B900086E8D8 /* Main.storyboard in Resources */,
+				4EDDA26E1D375A3E00C8D0D0 /* bgm.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

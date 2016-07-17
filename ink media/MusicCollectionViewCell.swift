@@ -28,7 +28,6 @@ class MusicCollectionViewCell: UICollectionViewCell {
         self.contentView.layer.shadowRadius = 2.0
         self.contentView.layer.shadowOffset = CGSizeMake(0.6, 0.6)
     }
-    
     internal var album: Album? {
         didSet {
             dispatch_async(dispatch_get_main_queue()) {

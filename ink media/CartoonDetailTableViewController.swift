@@ -16,6 +16,15 @@ class CartoonDetailTableViewController: UITableViewController {
         static let CartoonDownloadTableViewCellIdentifier = "CartoonDownload"
         
     }
+    var thumbnailImage: UIImage? {
+        didSet {
+            self.tableView.backgroundView = UIImageView(image: thumbnailImage)
+            let blur = UIBlurEffect(style: UIBlurEffectStyle.ExtraLight)
+            let blurView = UIVisualEffectView(effect: blur)
+            blurView.frame = self.tableView.bounds
+            self.tableView.backgroundView!.insertSubview(blurView, atIndex: 0)
+        }
+    }
     
     var activeDownloads = [String: Download]()
     
@@ -122,6 +131,10 @@ class CartoonDetailTableViewController: UITableViewController {
             if let cartoonDetailTableViewCell = cell as? CartoonDetailTableViewCell
             {
                 cartoonDetailTableViewCell.cartoon = cartoon
+                if !connectToNKU
+                {
+                    cartoonDetailTableViewCell.thumbnailImageView.image = thumbnailImage
+                }
             }
         } else {
             cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.CartoonDownloadTableViewCellIdentifier)!

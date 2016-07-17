@@ -12,11 +12,11 @@ private let reuseIdentifier = "MusicCollectionCell"
 
 class MusicCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UISearchBarDelegate {
     
-    var connectToNKU = true
+    let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
+    
     var readyToDisplay = false
     var waitingView: WaitingView?
     var blankView: UIView?
-    
     let hotArtists = ["周杰伦" , "孙燕姿" , "张国荣" , "王菲" , "张靓颖" , "邓紫棋" , "陈慧琳" , "莫文蔚"]
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,7 +43,10 @@ class MusicCollectionViewController: UICollectionViewController, UICollectionVie
         didSet {
             if albums.count > 0
             {
-                fetchThumbnailURL()
+                if connectToNKU!
+                {
+                    fetchThumbnailURL()
+                }
             }
             collectionView?.reloadData()
         }
@@ -94,8 +97,12 @@ class MusicCollectionViewController: UICollectionViewController, UICollectionVie
                 let indexPath = collectionView!.indexPathForCell(cell),
                 let seguedToMDTVC = segue.destinationViewController as? MusicDetailTableViewController
             {
-                seguedToMDTVC.connectToNKU = self.connectToNKU
+                seguedToMDTVC.connectToNKU = self.connectToNKU!
                 seguedToMDTVC.album = albums[indexPath.row]
+                if !connectToNKU!
+                {
+                    seguedToMDTVC.thumbnailImage = cell.albumThumbnail.image
+                }
             }
         }
     }
@@ -114,6 +121,10 @@ class MusicCollectionViewController: UICollectionViewController, UICollectionVie
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! MusicCollectionViewCell
         cell.album = albums[indexPath.row]
+        if !connectToNKU!
+        {
+            cell.albumThumbnail.image = UIImage(named: "music_offline_\(indexPath.row)")
+        }
         return cell
     }
     
@@ -136,33 +147,39 @@ class MusicCollectionViewController: UICollectionViewController, UICollectionVie
     
     func fetchFirstPage()
     {
-        addBlankView()
-        readyToDisplay = false
-        let randNum = time(nil) % hotArtists.count
-        let firstPageFetcher = MusicFetcher(searchText: hotArtists[randNum], searchType: .artist)
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0))
+        if connectToNKU == false
         {
-            firstPageFetcher.fetchMultipleAlbums({ [weak weakSelf = self] newAlbums in
-                dispatch_async(dispatch_get_main_queue(), {
-                    if !newAlbums.isEmpty {
-                        weakSelf?.albums = newAlbums
-                    }
-                    else
-                    {
-                        weakSelf?.connectToNKU = false
-                        weakSelf?.albums = Album.allAlbums()
-                    }
+            self.albums = Album.allAlbums()
+        }
+        else
+        {
+            addBlankView()
+            readyToDisplay = false
+            let randNum = time(nil) % hotArtists.count
+            let firstPageFetcher = MusicFetcher(searchText: hotArtists[randNum], searchType: .artist)
+            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0))
+            {
+                firstPageFetcher.fetchMultipleAlbums({ [weak weakSelf = self] newAlbums in
+                    dispatch_async(dispatch_get_main_queue(), {
+                        if !newAlbums.isEmpty {
+                            weakSelf?.albums = newAlbums
+                        }
+                        else
+                        {
+                            weakSelf?.albums = Album.allAlbums()
+                        }
+                    })
                 })
-            })
+            }
         }
     }
     
     private func searchForAlbums()
     {
-        addBlankView()
-        readyToDisplay = false
-        if connectToNKU
+        if connectToNKU!
         {
+            addBlankView()
+            readyToDisplay = false
             if let fetcher = musicFetcher {
                 lastFetcher = fetcher
                 dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0))
@@ -204,10 +221,6 @@ class MusicCollectionViewController: UICollectionViewController, UICollectionVie
             }
             if !newAlbums.isEmpty {
                 self.albums = newAlbums
-            }
-            else
-            {
-                self.readyToDisplay = true
             }
         }
     }
