@@ -17,16 +17,10 @@ protocol SlidePanelViewControllerDelegate {
 
 class SlidePanelViewController: UIViewController {
     
-    let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
-    let hasMovieFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasMovieFile
-    let hasMusicFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasMusicFile
-    let hasCartoonFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasCartoonFile
-    let connectToIPv6 = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToIPv6
-
     var delegate: SlidePanelViewControllerDelegate?
     
     let tabs = ["光影传奇" ,"12Club动漫" ,"桃源音乐", "音乐播放器","IPv6电视","电影文件","动漫播放器"]
-    let imageName = ["btn_slidebar_1","btn_slidebar_2","btn_slidebar_3","btn_slidebar_4","btn_slidebar_1","btn_slidebar_2","btn_slidebar_3"]
+    let imageName = ["btn_slidebar_1","btn_slidebar_2","btn_slidebar_3","btn_slidebar_3","btn_slidebar_4","btn_slidebar_1","btn_slidebar_2"]
     @IBOutlet weak var tableView: UITableView!
     
     struct TableView {
@@ -52,6 +46,10 @@ extension SlidePanelViewController: UITableViewDataSource {
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
+        let hasMovieFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasMovieFile
+        let hasMusicFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasMusicFile
+        let hasCartoonFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasCartoonFile
         if connectToNKU == false && hasMovieFile == false && hasCartoonFile == false && hasMusicFile == false {
             return 4
         }
@@ -59,6 +57,8 @@ extension SlidePanelViewController: UITableViewDataSource {
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
+        let hasMusicFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasMusicFile
         if let music = delegate!.currentlyPlayingMusic() where tabs[indexPath.row] == "音乐播放器"
         {
             let cell = tableView.dequeueReusableCellWithIdentifier(TableView.MusicPlayingCellIdentifier, forIndexPath: indexPath) as! MusicPlayingCell
@@ -84,6 +84,17 @@ extension SlidePanelViewController: UITableViewDataSource {
             cell.backgroundColor = UIColor.clearColor()
             return cell
         }
+        else if connectToNKU == false && hasMusicFile == false && delegate!.playingOrStop() == .Stop && tabs[indexPath.row] == "音乐播放器"
+        {
+            let cell = tableView.dequeueReusableCellWithIdentifier(TableView.MusicPlayingCellIdentifier, forIndexPath: indexPath) as! MusicPlayingCell
+            cell.musicPlayingButton.setTitle("", forState: .Normal)
+            cell.musicPlayingButton.setBackgroundImage(UIImage(named: "icon_play_normal"), forState: .Normal)
+            cell.isPlaying = false
+            cell.musicPlayingInfo.text = "南开大学校歌"
+            cell.musicPlayingInfo.textColor = UIColor(red: 102/255, green: 102/255, blue: 102/255, alpha: 1)
+            cell.backgroundColor = UIColor.clearColor()
+            return cell
+        }
         let cell = tableView.dequeueReusableCellWithIdentifier(TableView.TabCellIdentifier, forIndexPath: indexPath) as! TabCell
         cell.tabNameLabel.text = tabs[indexPath.row]
         if cell.tabNameLabel.text == delegate?.currentlyDisplayingVC()
@@ -104,11 +115,17 @@ extension SlidePanelViewController: UITableViewDataSource {
 extension SlidePanelViewController: UITableViewDelegate {
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
+        let hasMusicFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasMusicFile
         if let _ = tableView.cellForRowAtIndexPath(indexPath) as? MusicPlayingCell
         {
-            if !(connectToNKU == false && hasMovieFile == false && hasCartoonFile == false && hasMusicFile == false)
+            if connectToNKU == true || hasMusicFile == true
             {
                 delegate?.tabSelected("音乐播放器")
+            }
+            else
+            {
+                tableView.deselectRowAtIndexPath(indexPath, animated: true)
             }
         }
         else if let cell = tableView.cellForRowAtIndexPath(indexPath) as? TabCell

@@ -13,7 +13,6 @@ private let reuseIdentifier = "MovieCollectionCell"
 class MovieCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UISearchBarDelegate {
     
     var searchController: UISearchController!
-    let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
     var readyToDisplay = false
     var waitingView: WaitingView?
     var blankView: UIView?
@@ -31,6 +30,7 @@ class MovieCollectionViewController: UICollectionViewController, UICollectionVie
         didSet {
             if movies.count > 0
             {
+                let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
                 if connectToNKU!
                 {
                     fetchThumbnails()
@@ -113,7 +113,8 @@ class MovieCollectionViewController: UICollectionViewController, UICollectionVie
                 let indexPath = collectionView!.indexPathForCell(cell),
                 let seguedToMDTVC = segue.destinationViewController as? MovieDetailTableViewController
             {
-                seguedToMDTVC.connectToNKU = self.connectToNKU!
+                let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
+                seguedToMDTVC.connectToNKU = connectToNKU!
                 seguedToMDTVC.movie = movies[indexPath.row]
                 if !connectToNKU!
                 {
@@ -138,6 +139,7 @@ class MovieCollectionViewController: UICollectionViewController, UICollectionVie
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! MovieCollectionViewCell
         cell.movie = movies[indexPath.row]
+        let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
         if !connectToNKU!
         {
             cell.movieThumbnail.image = UIImage(named: "movie_offline_\((movies[indexPath.row].id)!)")
@@ -163,6 +165,7 @@ class MovieCollectionViewController: UICollectionViewController, UICollectionVie
     
     private func fetchFirstPage()
     {
+        let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
         if connectToNKU == false
         {
             self.movies = Movie.allMovies()
@@ -189,6 +192,7 @@ class MovieCollectionViewController: UICollectionViewController, UICollectionVie
     
     private func searchForMovies()
     {
+        let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
         if connectToNKU! {
             addBlankView()
             readyToDisplay = false

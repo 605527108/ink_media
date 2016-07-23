@@ -35,11 +35,6 @@ class ContainerViewController: UIViewController {
     
     var currentPlayingIndex: Int?
     
-    let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
-    let hasMovieFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasMovieFile
-    let hasCartoonFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasCartoonFile
-    let hasMusicFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasMusicFile
-    
     var centerNavigationController: UINavigationController!
     var centerViewController: AnyObject!
     var currentCenterViewControllerClass: String!
@@ -80,21 +75,6 @@ class ContainerViewController: UIViewController {
         catch
         {
             print("Player set background failed")
-        }
-        if connectToNKU == false && hasMovieFile == false && hasCartoonFile == false && hasMusicFile == false
-        {
-            self.musicPlayingQueue.append(Music(name: "南开大学校歌", id: "0"))
-            numOfMusicFile = 1
-            currentPlayingIndex = 0
-            deInitPlayer()
-            
-            var playingItemQueue = [AVPlayerItem]()
-            let bgm = NSBundle.mainBundle().pathForResource("bgm", ofType: "wav")
-            let fileURL = NSURL(fileURLWithPath: bgm!)
-            let playItem = AVPlayerItem(URL: fileURL)
-            playingItemQueue.append(playItem)
-            audioPlayer = AVQueuePlayer(items: playingItemQueue)
-            startObserving()
         }
     }
     
@@ -262,7 +242,6 @@ extension ContainerViewController: SlidePanelViewControllerDelegate {
     func currentlyPlayingMusic() -> Music? {
         if playingOrStop() != .Stop
         {
-            print("currentPlayingIndex\(currentPlayingIndex)")
             let music = musicPlayingQueue[currentPlayingIndex!]
             return music
         }
@@ -299,6 +278,9 @@ extension ContainerViewController {
     
     func processMusicPlayingQueue(notification: NSNotification)
     {
+        let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
+        let hasMusicFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasMusicFile
+
         if let signal = notification.userInfo!["signal"] as? String //there's a control signal from musicfiletableview
         {
             if signal == "delete" // music deleted in musicfiletableview so need to deInitPlayer
@@ -310,7 +292,11 @@ extension ContainerViewController {
                 if let playingQueue = notification.userInfo!["musicPlayingQueue"] as? [Music] //receive a play list, It's from fileTVC
                 {
                     self.musicPlayingQueue = playingQueue
-                    numOfMusicFile = musicPlayingQueue.count
+                    if playingQueue.count == 1
+                    {
+                        self.musicPlayingQueue.appendContentsOf(playingQueue)
+                    }
+                    numOfMusicFile = self.musicPlayingQueue.count
                     currentPlayingIndex = notification.userInfo!["startAtIndexPath"] as? Int
                     deInitPlayer()
                     initPlayer()
@@ -322,6 +308,17 @@ extension ContainerViewController {
                         audioPlayer?.play()
                         playingStatus = .Playing
                         startObserving()
+                    }
+                    else if playingStatus == .Stop && connectToNKU == false && hasMusicFile == false
+                    {
+                        var playingQueue = [Music]()
+                        playingQueue.append(Music(name: "南开大学校歌", id: "0"))
+                        playingQueue.append(Music(name: "南开大学校歌", id: "0"))
+                        self.musicPlayingQueue = playingQueue
+                        numOfMusicFile = 2
+                        currentPlayingIndex = 0
+                        deInitPlayer()
+                        initPlayer()
                     }
                 }
             }
@@ -343,14 +340,28 @@ extension ContainerViewController {
     
     func initPlayer()
     {
+        let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
+        let hasMusicFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasMusicFile
         var playingItemQueue = [AVPlayerItem]()
-        for index in 0...(numOfMusicFile! - 1)
+        if connectToNKU == false && hasMusicFile == false
         {
-            let shiftIndex = (currentPlayingIndex! + index) % numOfMusicFile!
-            let pathComponent = (musicPlayingQueue[shiftIndex].name!) + (musicPlayingQueue[shiftIndex].id!) + ".mp3"
-            let fileURL = FileManager.pathOfDocumentDirectory().URLByAppendingPathComponent(pathComponent)
-            let playItem = AVPlayerItem(URL: fileURL)
+            let bgm = NSBundle.mainBundle().pathForResource("bgm", ofType: "wav")
+            let bgmURL = NSURL(fileURLWithPath: bgm!)
+            let playItem = AVPlayerItem(URL: bgmURL)
+            let playItem2 = AVPlayerItem(URL: bgmURL)
             playingItemQueue.append(playItem)
+            playingItemQueue.append(playItem2)
+        }
+        else
+        {
+            for index in 0...(numOfMusicFile! - 1)
+            {
+                let shiftIndex = (currentPlayingIndex! + index) % numOfMusicFile!
+                let pathComponent = (musicPlayingQueue[shiftIndex].name!) + (musicPlayingQueue[shiftIndex].id!) + ".mp3"
+                let fileURL = FileManager.pathOfDocumentDirectory().URLByAppendingPathComponent(pathComponent)
+                let playItem = AVPlayerItem(URL: fileURL)
+                playingItemQueue.append(playItem)
+            }
         }
         audioPlayer = AVQueuePlayer(items: playingItemQueue)
         startObserving()
@@ -388,16 +399,8 @@ extension ContainerViewController {
                 print(errorMessage!)
             }
         } else if keyPath == "currentItem" {
-            print("reach end")
-            if numOfMusicFile != nil
-            {
-                print("numOfMusicFile \(numOfMusicFile)")
-                currentPlayingIndex = (currentPlayingIndex! + 1) % numOfMusicFile!
-                print("currentPlayingIndex \(currentPlayingIndex)")
-
-            }
+            currentPlayingIndex = (currentPlayingIndex! + 1) % numOfMusicFile!
             if let itemRemoved = change?[NSKeyValueChangeOldKey] as? AVPlayerItem {
-                print("requeue item")
                 stopObserving()
                 audioPlayer!.removeItem(itemRemoved)
                 itemRemoved.seekToTime(kCMTimeZero)
@@ -429,11 +432,7 @@ extension ContainerViewController {
                 stopObserving()
                 playingStatus = .Pause
             case .RemoteControlNextTrack:
-                if audioPlayer?.items().count == 1 {
-                    audioPlayer?.seekToTime(CMTimeMake(0,1))
-                } else {
-                    audioPlayer?.advanceToNextItem()
-                }
+                audioPlayer?.advanceToNextItem()
             case .RemoteControlPreviousTrack:
                 audioPlayer?.seekToTime(CMTimeMake(0,1))
             default: break

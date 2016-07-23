@@ -12,8 +12,6 @@ private let reuseIdentifier = "MusicCollectionCell"
 
 class MusicCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UISearchBarDelegate {
     
-    let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
-    
     var readyToDisplay = false
     var waitingView: WaitingView?
     var blankView: UIView?
@@ -43,6 +41,7 @@ class MusicCollectionViewController: UICollectionViewController, UICollectionVie
         didSet {
             if albums.count > 0
             {
+                let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
                 if connectToNKU!
                 {
                     fetchThumbnailURL()
@@ -97,7 +96,8 @@ class MusicCollectionViewController: UICollectionViewController, UICollectionVie
                 let indexPath = collectionView!.indexPathForCell(cell),
                 let seguedToMDTVC = segue.destinationViewController as? MusicDetailTableViewController
             {
-                seguedToMDTVC.connectToNKU = self.connectToNKU!
+                let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
+                seguedToMDTVC.connectToNKU = connectToNKU!
                 seguedToMDTVC.album = albums[indexPath.row]
                 if !connectToNKU!
                 {
@@ -121,6 +121,7 @@ class MusicCollectionViewController: UICollectionViewController, UICollectionVie
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! MusicCollectionViewCell
         cell.album = albums[indexPath.row]
+        let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
         if !connectToNKU!
         {
             cell.albumThumbnail.image = UIImage(named: "music_offline_\(indexPath.row)")
@@ -147,6 +148,7 @@ class MusicCollectionViewController: UICollectionViewController, UICollectionVie
     
     func fetchFirstPage()
     {
+        let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
         if connectToNKU == false
         {
             self.albums = Album.allAlbums()
@@ -176,6 +178,7 @@ class MusicCollectionViewController: UICollectionViewController, UICollectionVie
     
     private func searchForAlbums()
     {
+        let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
         if connectToNKU!
         {
             addBlankView()

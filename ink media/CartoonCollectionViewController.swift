@@ -12,7 +12,6 @@ private let reuseIdentifier = "CartoonCollectionCell"
 
 class CartoonCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UISearchBarDelegate {
     
-    let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
     var searchController: UISearchController!
     var readyToDisplay = false
     var waitingView: WaitingView?
@@ -31,6 +30,7 @@ class CartoonCollectionViewController: UICollectionViewController, UICollectionV
         didSet {
             if cartoons.count > 0
             {
+                let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
                 if connectToNKU!
                 {
                     fetchThumbnails()
@@ -86,6 +86,7 @@ class CartoonCollectionViewController: UICollectionViewController, UICollectionV
     }
     
     func fetchFirstPage() {
+        let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
         if connectToNKU == false
         {
             self.cartoons = Cartoon.allCartoons()
@@ -111,6 +112,7 @@ class CartoonCollectionViewController: UICollectionViewController, UICollectionV
     }
     
     func searchForCartoon() {
+        let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
         if connectToNKU! {
             addBlankView()
             readyToDisplay = false
@@ -208,7 +210,8 @@ class CartoonCollectionViewController: UICollectionViewController, UICollectionV
                 let seguedToCDTVC = segue.destinationViewController as? CartoonDetailTableViewController
             {
                 seguedToCDTVC.cartoon = cartoons[indexPath.row]
-                seguedToCDTVC.connectToNKU = self.connectToNKU!
+                let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
+                seguedToCDTVC.connectToNKU = connectToNKU!
                 if !connectToNKU!
                 {
                     seguedToCDTVC.thumbnailImage = cell.cartoonThumbnailImageView.image
@@ -232,6 +235,7 @@ class CartoonCollectionViewController: UICollectionViewController, UICollectionV
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! CartoonCollectionViewCell
         cell.cartoon = cartoons[indexPath.row]
+        let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
         if !connectToNKU!
         {
             cell.cartoonThumbnailImageView.image = UIImage(named: "cartoon_offline_\((cartoons[indexPath.row].id)!)")

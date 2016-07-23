@@ -20,7 +20,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var highResolution: Bool = false
     var connectToNKU: Bool = false
     var backgroundSessionCompletionHandler: (() -> Void)?
-//    let tintColor =  UIColor(red: 242/255, green: 71/255, blue: 63/255, alpha: 1)
     let tintColor =  UIColor(red: 248/255, green: 0/255, blue: 0/255, alpha: 1)
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
