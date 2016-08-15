@@ -59,8 +59,10 @@ extension SlidePanelViewController: UITableViewDataSource {
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let connectToNKU = (UIApplication.sharedApplication().delegate as? AppDelegate)?.connectToNKU
         let hasMusicFile = (UIApplication.sharedApplication().delegate as? AppDelegate)?.hasMusicFile
+        print("SlidePanelOpen")
         if let music = delegate!.currentlyPlayingMusic() where tabs[indexPath.row] == "音乐播放器"
         {
+            print("currentlyPlayingMusic")
             let cell = tableView.dequeueReusableCellWithIdentifier(TableView.MusicPlayingCellIdentifier, forIndexPath: indexPath) as! MusicPlayingCell
             cell.musicPlayingButton.setTitle("", forState: .Normal)
             if delegate!.playingOrStop() == .Playing
@@ -86,6 +88,7 @@ extension SlidePanelViewController: UITableViewDataSource {
         }
         else if connectToNKU == false && hasMusicFile == false && delegate!.playingOrStop() == .Stop && tabs[indexPath.row] == "音乐播放器"
         {
+            print("connectToNKUAndShow南开大学校歌")
             let cell = tableView.dequeueReusableCellWithIdentifier(TableView.MusicPlayingCellIdentifier, forIndexPath: indexPath) as! MusicPlayingCell
             cell.musicPlayingButton.setTitle("", forState: .Normal)
             cell.musicPlayingButton.setBackgroundImage(UIImage(named: "icon_play_normal"), forState: .Normal)

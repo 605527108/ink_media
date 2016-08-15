@@ -40,6 +40,7 @@ class CartoonDetailTableViewController: UITableViewController {
         didSet {
             if connectToNKU
             {
+                print("connectToNKU=\(connectToNKU)andfetchDetail")
                 fetchDetail()
             }
         }
@@ -131,7 +132,7 @@ class CartoonDetailTableViewController: UITableViewController {
             if let cartoonDetailTableViewCell = cell as? CartoonDetailTableViewCell
             {
                 cartoonDetailTableViewCell.cartoon = cartoon
-                if !connectToNKU
+                if connectToNKU == false
                 {
                     cartoonDetailTableViewCell.thumbnailImageView.image = thumbnailImage
                 }

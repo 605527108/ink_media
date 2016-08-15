@@ -40,6 +40,7 @@ class MusicDetailTableViewController: UITableViewController {
         didSet{
             if connectToNKU
             {
+                print("connectToNKU=\(connectToNKU)andgetDetail")
                 getDetail()
             }
             else
@@ -136,7 +137,7 @@ class MusicDetailTableViewController: UITableViewController {
             if let albumCell = cell as? AlbumDetailTableViewCell
             {
                 albumCell.album = album!
-                if !connectToNKU
+                if connectToNKU == false
                 {
                     albumCell.albumThumbnail.image = thumbnailImage
                 }

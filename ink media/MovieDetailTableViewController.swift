@@ -41,6 +41,7 @@ class MovieDetailTableViewController: UITableViewController {
         didSet {
             if connectToNKU
             {
+                print("connectToNKU=\(connectToNKU)andfetchDetail")
                 fetchDetail()
             }
         }
@@ -150,7 +151,7 @@ class MovieDetailTableViewController: UITableViewController {
             if let movieDetailTableViewCell = cell as? MovieDetailTableViewCell
             {
                 movieDetailTableViewCell.movie = movie
-                if !connectToNKU
+                if connectToNKU == false
                 {
                     movieDetailTableViewCell.thumbnailImageView.image = thumbnailImage
                 }

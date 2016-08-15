@@ -59,7 +59,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if(error != nil)
             {
                 print(error?.localizedDescription)
-                self.connectToNKU = false
             }
             else
             {
@@ -87,7 +86,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if(error != nil)
             {
                 print(error?.localizedDescription)
-                self.connectToIPv6 = false
             }
             else
             {
@@ -112,7 +110,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             request.predicate = nil
             if ((try? self.managedObjectContext.executeFetchRequest(request))?.first as? MovieFile) == nil
             {
-                weakSelf?.hasMovieFile = false
                 print("No movieFile")
             }
             else
@@ -129,7 +126,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             request.predicate = nil
             if ((try? self.managedObjectContext.executeFetchRequest(request))?.first as? CartoonFile) == nil
             {
-                weakSelf?.hasCartoonFile = false
                 print("No cartoonFile")
             }
             else
@@ -146,7 +142,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             request.predicate = nil
             if ((try? self.managedObjectContext.executeFetchRequest(request))?.first as? MusicFile) == nil
             {
-                weakSelf?.hasMusicFile = false
                 print("No musicFile")
             }
             else
